@@ -1,6 +1,6 @@
 # Immich v3.0.3 media integration contract
 
-Research date: 2026-07-16  
+Research date: 2026-07-16
 Target server: Immich v3.0.3
 
 ## Decision
