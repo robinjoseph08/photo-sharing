@@ -21,11 +21,11 @@ The curator-confirmed people who were present at a moment; face detections may s
 _Avoid_: Detected faces, appearances
 
 **Interest list**:
-The People explicitly chosen by a Recipient, or by the Curator on that Recipient's behalf, whose Attendance should cause that Recipient to be suggested for a Moment. Choices are limited to People visible through shared Visibility circles. Either may edit the list, and every change is attributed to the Person who made it and retained in an audit history. Family changes may provide new choices but never alter the list automatically; losing shared visibility deactivates an ineligible choice without erasing its history. It influences an Audience proposal but never grants access.
+The People explicitly chosen by a Recipient, or by the Curator on that Recipient's behalf, whose Attendance should cause that Recipient to be suggested for a Moment. Choices are limited to People visible through shared Visibility circles. Either may edit the list, and every change is attributed to the Person who made it and retained in an audit history. Changes to Family relationships or a Family branch may provide new choices but never alter the list automatically; when a Recipient and chosen Person no longer share any Visibility circle, that choice is deactivated without erasing its history. It influences an Audience proposal but never grants access.
 _Avoid_: Permissions, subscriptions, access list
 
 **Family relationship**:
-An explicit parent-child, current-partner, or sibling connection between People. Sibling connections may be recorded even when their shared parents are absent; they annotate People choices but do not seed a Family branch.
+An explicit parent-child, partner, or sibling connection between People. Partner connections may be current or former; sibling connections may be recorded even when their shared parents are absent. Both annotate People choices, but only current partners seed a Family branch.
 _Avoid_: Account relationship, inferred relationship
 
 **Visibility circle**:
@@ -49,11 +49,11 @@ A photo or video shared independently rather than through an event.
 _Avoid_: One-off, loose photo
 
 **Audience proposal**:
-The system's suggested Recipients for a Moment, based on Attendance, Interest lists, or Curator choices, which becomes an Audience only after Curator approval. The Curator never appears in a proposal because Curator authority already provides access.
+A draft set of Recipients for a Moment, derived by intersecting confirmed Attendance with their Interest lists and then applying Curator additions or exclusions. It becomes an Audience only after Curator approval. The Curator never appears in a proposal because Curator authority already provides access.
 _Avoid_: Automatic sharing, recipient list
 
 **Audience**:
-The approved recipients allowed to access a moment or loose item.
+A Curator-approved snapshot of the Recipients allowed to access one Moment or Loose item. It is the sole source of recipient media access and never recalculates from later changes to Attendance, Family relationships, Interest lists, or Visibility circles.
 _Avoid_: Members, invitees
 
 **Publication**:
