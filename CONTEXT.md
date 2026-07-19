@@ -5,15 +5,15 @@ This context covers the private publication of one curator's photos and videos t
 ## Language
 
 **Curator**:
-The sole person who publishes media and controls who may access it.
+The sole Person with authority to publish media and control who may access it. Curator is a role on a Person, and that same Person may also be a Recipient rather than having a separate identity.
 _Avoid_: Publisher, admin, photographer
 
 **Recipient**:
-An invited family member who may receive access to published media but does not publish or manage sharing.
+A Person who has been invited to receive access to published media but does not publish or manage sharing. Each Recipient is exactly one Person; invitation, email, session, and access changes do not create or replace that Person.
 _Avoid_: User, viewer, contributor
 
 **Person**:
-A family member who may attend a moment, whether or not they have a recipient account.
+A family member who may attend a moment, whether or not they are a Recipient. A Person persists independently of invitation status, login access, and email address.
 _Avoid_: Contact, profile, face
 
 **Attendance**:
@@ -21,11 +21,19 @@ The curator-confirmed people who were present at a moment; face detections may s
 _Avoid_: Detected faces, appearances
 
 **Interest list**:
-The people whose attendance causes a recipient to be suggested for a moment; it influences an audience proposal but never grants access.
+The People explicitly chosen by a Recipient, or by the Curator on that Recipient's behalf, whose Attendance should cause that Recipient to be suggested for a Moment. Choices are limited to People visible through shared Visibility circles. Either may edit the list, and every change is attributed to the Person who made it and retained in an audit history. Family changes may provide new choices but never alter the list automatically; losing shared visibility deactivates an ineligible choice without erasing its history. It influences an Audience proposal but never grants access.
 _Avoid_: Permissions, subscriptions, access list
 
+**Family relationship**:
+An explicit parent-child, current-partner, or sibling connection between People. Sibling connections may be recorded even when their shared parents are absent; they annotate People choices but do not seed a Family branch.
+_Avoid_: Account relationship, inferred relationship
+
+**Visibility circle**:
+A Curator-managed, overlapping set of People that determines whom a Recipient may discover and choose for their Interest list. A Recipient may discover the union of People in every circle containing their own Person; membership is not transitive across circles and never grants media access.
+_Avoid_: Bubble, group, Audience
+
 **Family branch**:
-A person's partner, every descendant, and every descendant's partner recursively through all generations; it seeds that recipient's interest list.
+A Person's current partners, every descendant, and every descendant's current partners recursively through all generations. It provides relationship-annotated choices for that Recipient's Interest list but never adds them without explicit opt-in. Siblings and their descendants are not included automatically.
 _Avoid_: Immediate family, household
 
 **Event**:
@@ -41,7 +49,7 @@ A photo or video shared independently rather than through an event.
 _Avoid_: One-off, loose photo
 
 **Audience proposal**:
-The system's suggested recipients for a moment, based on attendance, interest lists, or curator choices, which becomes an audience only after curator approval.
+The system's suggested Recipients for a Moment, based on Attendance, Interest lists, or Curator choices, which becomes an Audience only after Curator approval. The Curator never appears in a proposal because Curator authority already provides access.
 _Avoid_: Automatic sharing, recipient list
 
 **Audience**:
@@ -57,7 +65,7 @@ The single coalescing set of source-library changes to a published event that re
 _Avoid_: Live sync, pending upload
 
 **Notification preference**:
-A recipient's choice to receive publication emails immediately, in a weekly digest, or not at all.
+A Recipient's choice to receive publication emails immediately, in a weekly digest, or not at all. Publication and activity notifications do not begin until the Recipient completes onboarding.
 _Avoid_: Access preference, subscription
 
 **Favorite**:
