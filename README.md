@@ -15,4 +15,4 @@ Open the local URL with one of these query parameters:
 - `?variant=B`: split-pane command center
 - `?variant=C`: Event canvas
 
-Add `&accent=cyan`, `&accent=sky`, or `&accent=blue` to compare Tailwind accent families. The floating switcher controls both the structural and color variants. The prototype defaults to dark mode and includes a light-mode toggle. All data and interactions are in memory.
+Tailwind sky is the selected accent family. Add `&accent=cyan`, `&accent=sky`, or `&accent=blue` to revisit the retained color comparisons. The floating switcher controls both the structural and color variants. The prototype defaults to dark mode and includes a light-mode toggle. All data and interactions are in memory.
