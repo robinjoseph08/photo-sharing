@@ -11,9 +11,9 @@ npm run prototype
 
 Open the local URL with one of these query parameters:
 
-- `?variant=A`: timeline library, with New for you above a chronological collection
-- `?variant=B`: publication feed, with recent Publications presented as the primary experience
-- `?variant=C`: Event archive, with narrative Events leading and chronology secondary
+- `?variant=A`: selected Photos library, with compact New for you summaries, dense justified photo rows, and a desktop date scrubber
+- `?variant=B`: rejected publication-feed exploration, retained as design evidence
+- `?variant=C`: Event-page direction, retained separately from the Photos-page decision
 
 Use the floating switcher or the left and right arrow keys to compare variants. Each variant includes responsive navigation, Events, People and Interest-list editing, Favorites, Comments, downloads, notification settings, and replayable onboarding. Click a photo to inspect the responsive media viewer. Open the avatar menu to reach Settings and onboarding.
 
