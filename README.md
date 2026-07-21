@@ -15,6 +15,6 @@ Open the local URL with one of these query parameters:
 - `?variant=B`: rejected publication-feed exploration, retained as design evidence
 - `?variant=C`: Event-page direction, retained separately from the Photos-page decision
 
-Use the floating switcher or the left and right arrow keys to compare variants. Each variant includes responsive navigation, Events, People and Interest-list editing, Favorites, Comments, downloads, notification settings, and replayable onboarding. Click a photo to inspect the responsive media viewer. Open the avatar menu to reach Settings and onboarding.
+Use the floating switcher or the left and right arrow keys to compare variants. Each variant includes responsive navigation, Events, Favorites, Comments, downloads, notification settings, and replayable onboarding. Interest-list editing is available from the avatar menu rather than primary navigation. Click a photo to inspect the responsive media viewer. Open the avatar menu to reach the Interest list, Settings, and onboarding.
 
 All data and interactions are in memory. The prototype defaults to dark mode and uses Memento's selected Tailwind sky accent.
