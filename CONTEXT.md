@@ -44,6 +44,10 @@ _Avoid_: Immediate family, household
 
 ### Recipient access
 
+**Invitation suggestion**:
+A Recipient's request that the Curator consider granting another person access, with Submitted, Accepted, or Rejected status visible to the requester. It never creates a Person, Invitation, or Recipient access by itself.
+_Avoid_: Referral, recipient invitation, account request
+
 **Invitation**:
 A Curator-issued, single-use offer sent to a Person's login email that expires after fourteen days and begins Recipient access. It is explicitly accepted and may be revoked or reissued without replacing the Person.
 _Avoid_: Share link, login link
@@ -125,8 +129,16 @@ _Avoid_: Delete, source missing, unpublish
 ### Notifications and interactions
 
 **Notification preference**:
-A Recipient's choice to receive Publication emails immediately, in a weekly digest, or not at all. Publication and activity notifications do not begin until the Recipient completes Onboarding.
+A Recipient's account-level choice to receive optional Publication and Comment email immediately, in a weekly digest on a personally chosen schedule, or not at all. It never affects access or required identity and security email, and optional notifications do not begin until Onboarding is complete.
 _Avoid_: Access preference, subscription
+
+**Push preference**:
+A per-device choice to receive immediate Publication and Comment notifications with specific authorized context. It is independent of email and access, unavailable to Public-computer sessions, and may be enabled only from the supported device receiving it.
+_Avoid_: Account notification preference, mobile app notification
+
+**Engagement activity**:
+A first-party record of a Recipient's meaningful authenticated use of Memento, visible only to the Curator. It excludes background delivery, prefetching, email opens, incidental thumbnail display, and Curator preview.
+_Avoid_: Tracking pixel, third-party analytics, security audit
 
 **Favorite**:
 A recipient's personal selection of a photo or video, visible to that recipient and the curator but hidden from other recipients.
