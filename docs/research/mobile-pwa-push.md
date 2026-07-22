@@ -93,7 +93,7 @@ Because Apple notifications can appear on the Lock Screen and Web Push services 
 ## Product implication for this effort
 
 - Build the site responsive and installable as a PWA from the start: manifest, stable manifest `id`, icons, standalone display, HTTPS, and a service worker.
-- Keep the already-decided email choices—immediate, weekly digest, none—as the MVP notification behavior.
+- Keep the already-decided email choices of immediate, weekly digest, or none as the MVP notification behavior.
 - Treat push as a later per-device opt-in for immediate publication/update notices. It can coexist with an account-level email cadence; the eventual product decision can let a recipient choose email, push, both, or neither without changing access.
 - Preserve one durable in-portal “new since your last visit” view regardless of notification settings or delivery success.
 - If push is added, coalesce it at the same boundary as email: one notice per publication or published staged update, never one per photo.
