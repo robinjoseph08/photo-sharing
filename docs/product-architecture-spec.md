@@ -888,14 +888,14 @@ The same suite gates every proposed Immich upgrade before the contract version c
 
 ### Transactional setup
 
-**Given** setup is enabled, no Curator exists, and two browsers have verified setup email challenges  
-**When** both browsers submit final first-time Onboarding concurrently  
+**Given** setup is enabled, no Curator exists, and two browsers have verified setup email challenges\
+**When** both browsers submit final first-time Onboarding concurrently\
 **Then** exactly one transaction consumes its challenge, creates one Person with Curator and Recipient roles, disables setup, and the other request receives a conflict without creating a Person.
 
 ### Setup disabled
 
-**Given** first-time setup committed  
-**When** any browser or unauthenticated caller revisits setup  
+**Given** first-time setup committed\
+**When** any browser or unauthenticated caller revisits setup\
 **Then** Memento reveals only that setup is unavailable and cannot create another Curator.
 
 ### Person merge cannot union authority
@@ -906,140 +906,140 @@ The same suite gates every proposed Immich upgrade before the contract version c
 
 ### Pending Recipient preapproval
 
-**Given** the Curator designates a Person as a Pending Recipient but has not sent an Invitation  
-**When** the Curator approves that current access generation in a Moment Audience and publishes  
+**Given** the Curator designates a Person as a Pending Recipient but has not sent an Invitation\
+**When** the Curator approves that current access generation in a Moment Audience and publishes\
 **Then** the Publication commits, but the Pending Recipient cannot sign in, access Media, appear in delivery batches, or receive optional notifications.
 
 ### Onboarding unlocks current Audiences
 
-**Given** a Pending Recipient accepted an Invitation and has preapproved current-published Audiences  
-**When** they explicitly complete Onboarding  
+**Given** a Pending Recipient accepted an Invitation and has preapproved current-published Audiences\
+**When** they explicitly complete Onboarding\
 **Then** those current Audiences become accessible immediately, New for you reflects authorized published material, and no historical email or push backlog is sent.
 
 ### Revocation prevents silent restoration
 
-**Given** a Recipient has old Audience entries and active Sessions  
-**When** the Curator revokes access and later reinvites the same Person  
+**Given** a Recipient has old Audience entries and active Sessions\
+**When** the Curator revokes access and later reinvites the same Person\
 **Then** old Sessions fail, the new access generation does not match old Audience entries, and access returns only after new explicit Audience approval and Onboarding rules.
 
 ### Visibility does not authorize
 
-**Given** a Recipient can discover a Person through a Visibility circle and adds them to an Interest list  
-**When** no current approved Audience includes that Recipient  
+**Given** a Recipient can discover a Person through a Visibility circle and adds them to an Interest list\
+**When** no current approved Audience includes that Recipient\
 **Then** no Event, Media, search result, count, Comment, or notification becomes accessible.
 
 ### Faces do not authorize
 
-**Given** Immich detects a linked face in a Moment  
-**When** the Curator has not confirmed Attendance and approved an Audience  
+**Given** Immich detects a linked face in a Moment\
+**When** the Curator has not confirmed Attendance and approved an Audience\
 **Then** the face appears only as a Curator suggestion and no Recipient access changes.
 
 ### Atomic Publication
 
-**Given** a Staged update changes metadata, placements, Audience entries, search documents, and notifications  
-**When** a database failure occurs before commit  
+**Given** a Staged update changes metadata, placements, Audience entries, search documents, and notifications\
+**When** a database failure occurs before commit\
 **Then** Recipients continue seeing the prior complete projection and no outbox event or partial notification escapes.
 
 ### Empty Audience
 
-**Given** a Moment has an explicitly approved empty Audience  
-**When** the Event is published  
+**Given** a Moment has an explicitly approved empty Audience\
+**When** the Event is published\
 **Then** Publication succeeds, the Curator sees Curator only, and Recipients receive no hint that the Moment exists.
 
 ### Filtered Event privacy
 
-**Given** an Event has three Moments and a Recipient is authorized for only two  
-**When** the Recipient opens the Event  
+**Given** an Event has three Moments and a Recipient is authorized for only two\
+**When** the Recipient opens the Event\
 **Then** they see one seamless ordered gallery using only accessible Media, an accessible cover, and counts computed only from that Media, with no Moment boundary or hidden gap.
 
 ### Search privacy
 
-**Given** inaccessible Media matches a query and accessible Media does not  
-**When** a Recipient searches  
+**Given** inaccessible Media matches a query and accessible Media does not\
+**When** a Recipient searches\
 **Then** the response says nothing in their shared collection matched and reveals no hidden total, Person, place, Event, cover, or facet.
 
 ### Source removal is staged
 
-**Given** a published Media item is removed from a Source album but Immich still serves it  
-**When** reconciliation confirms the removal twice  
+**Given** a published Media item is removed from a Source album but Immich still serves it\
+**When** reconciliation confirms the removal twice\
 **Then** Memento stages a removal and keeps the current published representation until Curator Publication.
 
 ### Source missing fails closed
 
-**Given** a published Media item can no longer be served by Immich  
-**When** a Recipient requests its thumbnail or original  
+**Given** a published Media item can no longer be served by Immich\
+**When** a Recipient requests its thumbnail or original\
 **Then** Memento does not serve stale server-side bytes, marks the listing unavailable, and raises a Curator problem without silently rewriting the Publication.
 
 ### Relink preserves portal identity
 
-**Given** Immich re-imports a source file under a new asset UUID  
-**When** the Curator confirms a repair proposal  
+**Given** Immich re-imports a source file under a new asset UUID\
+**When** the Curator confirms a repair proposal\
 **Then** the Memento Media ID, URL, placements, Audiences, Comments, Favorites, and history remain unchanged while the backing changes.
 
 ### Range proxy authorization
 
-**Given** a valid trusted Session and current Media entitlement  
-**When** the browser requests a video byte range  
+**Given** a valid trusted Session and current Media entitlement\
+**When** the browser requests a video byte range\
 **Then** Memento reauthorizes, forwards the Range request, streams the valid partial response, and exposes no Immich URL or credential.
 
 ### Multi-part archive revocation
 
-**Given** an authorized archive plan has three individually single-use parts  
-**When** part one finishes and the Curator revokes the Recipient before part two begins  
+**Given** an authorized archive plan has three individually single-use parts\
+**When** part one finishes and the Curator revokes the Recipient before part two begins\
 **Then** parts two and three fail authorization, and replaying part one is rejected as already consumed.
 
 ### Matching notification channels
 
-**Given** a completed Recipient has Immediate email and device push enabled  
-**When** qualifying Publication and Comment activity occurs within one 15-minute window  
+**Given** a completed Recipient has Immediate email and device push enabled\
+**When** qualifying Publication and Comment activity occurs within one 15-minute window\
 **Then** one email batch and one push batch contain matching currently authorized activity, each subject to its independent channel preference and delivery result.
 
 ### Quiet correction
 
-**Given** a Publication only reorders Media and corrects metadata  
-**When** the Curator publishes with notifications enabled  
+**Given** a Publication only reorders Media and corrects metadata\
+**When** the Curator publishes with notifications enabled\
 **Then** the correction appears in current content and Curator activity but generates no optional email or push.
 
 ### Comment authorization
 
-**Given** a Recipient previously Commented on a Media item and then loses access  
-**When** another authorized Recipient Comments  
+**Given** a Recipient previously Commented on a Media item and then loses access\
+**When** another authorized Recipient Comments\
 **Then** the first Recipient receives no activity and cannot read the item or thread, while their prior Comment remains attributed for the Curator and currently authorized Recipients.
 
 ### Favorite privacy
 
-**Given** two Recipients can access the same Media item  
-**When** one marks it as a Favorite  
+**Given** two Recipients can access the same Media item\
+**When** one marks it as a Favorite\
 **Then** only that Recipient and the Curator can see the Favorite, with no shared count or external notification.
 
 ### Preview is read-only
 
-**Given** the Curator enters Preview as Recipient  
-**When** they browse an Event and open Media  
+**Given** the Curator enters Preview as Recipient\
+**When** they browse an Event and open Media\
 **Then** Recipient authorization filtering applies, interaction and download controls are disabled, and the actions do not create Recipient engagement.
 
 ### Session revocation disables push
 
-**Given** a trusted Session has an active Web Push subscription  
-**When** the Recipient revokes that Session or signs out all Sessions  
+**Given** a trusted Session has an active Web Push subscription\
+**When** the Recipient revokes that Session or signs out all Sessions\
 **Then** the linked subscription is disabled before any later batch sends, while the Recipient's email preference remains unchanged.
 
 ### Outbound redirects fail closed
 
-**Given** Immich returns a thumbnail redirect to another origin or a Recipient submits a push endpoint that resolves to a private address  
-**When** Memento validates the outbound request  
+**Given** Immich returns a thumbnail redirect to another origin or a Recipient submits a push endpoint that resolves to a private address\
+**When** Memento validates the outbound request\
 **Then** it rejects the request without forwarding an Immich key, making the private connection, or disclosing the target response.
 
 ### Generic SMTP limitation
 
-**Given** SMTP accepts a message and later the provider learns of a complaint  
-**When** no provider-specific adapter is installed  
+**Given** SMTP accepts a message and later the provider learns of a complaint\
+**When** no provider-specific adapter is installed\
 **Then** Memento does not claim complaint detection; optional email changes only from synchronous results, one-click unsubscribe, Recipient action, or future adapter input.
 
 ### Backup boundary
 
-**Given** the operator backs up only the Memento logical database with `pg_dump`  
-**When** it is restored into a clean Memento database and the same configuration and secrets are supplied  
+**Given** the operator backs up only the Memento logical database with `pg_dump`\
+**When** it is restored into a clean Memento database and the same configuration and secrets are supplied\
 **Then** portal state is recoverable, while Media availability still depends on the independently operated Immich instance.
 
 ### Restored authorization is held
@@ -1050,8 +1050,8 @@ The same suite gates every proposed Immich upgrade before the contract version c
 
 ### Graceful worker recovery
 
-**Given** a worker holds a reconciliation lease  
-**When** the process receives SIGTERM and cannot finish before the drain deadline  
+**Given** a worker holds a reconciliation lease\
+**When** the process receives SIGTERM and cannot finish before the drain deadline\
 **Then** it exits without marking success, the lease expires, and the next process safely reclaims the idempotent job.
 
 ## Dependency-ordered implementation phases
