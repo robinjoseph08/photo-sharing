@@ -11,11 +11,15 @@ The sole Person with authority to publish media and control who may access it. C
 _Avoid_: Publisher, admin, photographer
 
 **Recipient**:
-A Person who has been invited to receive access to published media but does not publish or manage sharing. Each Recipient is exactly one Person with one case-insensitively unique login email; Invitation, email, Session, and access changes do not create or replace that Person.
+A Person whom the Curator has designated to receive access to published media, whether or not their Invitation has been sent or accepted. Each Recipient is exactly one Person with one case-insensitively unique login email; Invitation, email, Session, and access changes do not create or replace that Person.
 _Avoid_: User, viewer, contributor
 
+**Pending Recipient**:
+A Recipient who has not completed Onboarding, including one whose Invitation has not yet been sent. They may be approved in Audiences but cannot access Media or receive optional notifications until Onboarding is complete.
+_Avoid_: Draft user, uninvited user, inactive user
+
 **Eligible Recipient**:
-A Recipient whose access is neither suspended nor revoked. Completing Onboarding is not required for Audience approval, but Publication and activity notifications wait until Onboarding is complete.
+A Recipient whose access is neither suspended nor revoked. Pending Recipient status does not prevent Audience approval, but Publication and activity notifications wait until Onboarding is complete.
 _Avoid_: Active user, enabled user
 
 **Person**:
@@ -49,8 +53,8 @@ A Recipient's request that the Curator consider granting another person access, 
 _Avoid_: Referral, recipient invitation, account request
 
 **Invitation**:
-A Curator-issued, single-use offer sent to a Person's login email that expires after fourteen days and begins Recipient access. It is explicitly accepted and may be revoked or reissued without replacing the Person.
-_Avoid_: Share link, login link
+A Curator-issued, single-use offer sent to a Pending Recipient's login email that expires after fourteen days and begins Invitation acceptance and Onboarding. It is explicitly accepted and may be deferred, revoked, or reissued without creating or replacing the Recipient.
+_Avoid_: Share link, login link, Recipient access
 
 **Onboarding**:
 The initial Recipient setup between Invitation acceptance and the Recipient's explicit completion. Completion is required for all access and delivery of published Media items and for Publication or activity notifications, and a later email change does not repeat it.
@@ -75,6 +79,10 @@ _Avoid_: Permanent login, account
 **Public-computer session**:
 A Recipient Session chosen for a public or shared computer whose browser credential is discarded when the browser session ends and whose server-side authorization expires after twelve hours.
 _Avoid_: Trusted device, incognito mode
+
+**Recovery hold**:
+A system-wide safety state after database restoration that blocks Recipient access and optional notifications until the Curator reviews the restored authorization state. It invalidates restored Sessions without changing People, Audiences, Publications, or interaction history.
+_Avoid_: Maintenance mode, outage, suspension
 
 ### Media and publication
 
