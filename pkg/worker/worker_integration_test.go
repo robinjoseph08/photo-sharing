@@ -62,12 +62,12 @@ func TestShutdownStopsClaimsAndMakesLeaseReclaimable(t *testing.T) {
 func TestHeartbeatPreventsASecondWorkerFromReclaimingLiveWork(t *testing.T) {
 	db := testdb.Open(t)
 	require.NoError(t, migrations.Apply(context.Background(), db))
-	_, err := db.NewRaw(`INSERT INTO jobs (kind) VALUES ('blocking')`).Exec(context.Background())
-	require.NoError(t, err)
+	var id int64
+	require.NoError(t, db.NewRaw(`INSERT INTO jobs (kind) VALUES ('blocking') RETURNING id`).Scan(context.Background(), &id))
 
 	cfg := testConfig()
-	cfg.HeartbeatInterval = 20 * time.Millisecond
-	cfg.LeaseDuration = 300 * time.Millisecond
+	cfg.HeartbeatInterval = 50 * time.Millisecond
+	cfg.LeaseDuration = 2 * time.Second
 	started := make(chan struct{})
 	release := make(chan struct{})
 	first, err := New(db, cfg, "first-owner", map[string]Handler{
@@ -85,29 +85,37 @@ func TestHeartbeatPreventsASecondWorkerFromReclaimingLiveWork(t *testing.T) {
 		t.Fatal("first worker did not claim the job")
 	}
 
-	duplicate := make(chan struct{}, 1)
+	var observedExpiry time.Time
+	require.NoError(t, db.NewRaw(`SELECT lease_expires_at FROM jobs WHERE id = ?`, id).Scan(context.Background(), &observedExpiry))
+	require.Eventually(t, func() bool {
+		var passed bool
+		err := db.NewRaw(`SELECT now() >= ?`, observedExpiry).Scan(context.Background(), &passed)
+		return err == nil && passed
+	}, cfg.LeaseDuration+time.Second, 25*time.Millisecond)
+
 	second, err := New(db, cfg, "second-owner", map[string]Handler{
-		"blocking": func(context.Context, Job) error {
-			duplicate <- struct{}{}
-			return nil
-		},
+		"blocking": func(context.Context, Job) error { return nil },
 	})
 	require.NoError(t, err)
-	second.Start(context.Background())
-	select {
-	case <-duplicate:
-		t.Fatal("live lease was reclaimed")
-	case <-time.After(3 * cfg.LeaseDuration):
-	}
+	duplicate, err := second.claim(context.Background())
+	require.NoError(t, err)
+	assert.Nil(t, duplicate, "live lease was reclaimed after its originally observed expiry")
+
+	var owner string
+	var expiresInFuture bool
+	require.NoError(t, db.NewRaw(`
+		SELECT lease_owner, lease_expires_at > now()
+		FROM jobs WHERE id = ?
+	`, id).Scan(context.Background(), &owner, &expiresInFuture))
+	assert.Equal(t, "first-owner", owner)
+	assert.True(t, expiresInFuture)
 	assert.True(t, first.Healthy(time.Second), "job execution must not stall the process heartbeat")
 
 	close(release)
 	first.StopClaims()
-	second.StopClaims()
 	drainCtx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	require.NoError(t, first.Drain(drainCtx))
-	require.NoError(t, second.Drain(drainCtx))
 }
 
 func TestExpiredLeaseIsReclaimedAndCompleted(t *testing.T) {
