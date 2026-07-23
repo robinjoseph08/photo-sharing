@@ -29,7 +29,7 @@ The current foundation does not yet expose first-time browser setup or Recipient
 
 ## Developer prerequisites
 
-[Mise](https://mise.jdx.dev/) is the source of truth for development tool versions and project tasks. `mise.toml` pins Go 1.25.5, Node.js 24.13.0, pnpm 11.16.0, Air 1.64.2, and golangci-lint 2.12.2. Tygo 0.2.21 remains pinned as a Go tool in `go.mod`, and deployment files pin all container base tags.
+[Mise](https://mise.jdx.dev/) is the source of truth for development tool versions and project tasks. `mise.toml` pins Go 1.26.5, Node.js 24.18.0, pnpm 11.16.0, Air 1.64.2, and golangci-lint 2.12.2. Tygo 0.2.21 remains pinned as a Go tool in `go.mod`, and deployment files pin all container base tags.
 
 Install mise and Docker with the Compose plugin, then install the pinned tools, project dependencies, and generated API types:
 
@@ -50,9 +50,9 @@ mise run build
 mise run types:generate
 ```
 
-`mise start` runs the Go API through Air and the Vite frontend together. On a fresh checkout, it also starts disposable PostgreSQL and Immich stub containers, supplies development-only runtime configuration, and prints the dynamically selected API and web URLs. Stopping the task removes those containers and their data. Air rebuilds the API and regenerates Tygo types when Go files change.
+`mise start` runs three foreground tasks together: the root Docker Compose development dependencies, the Go API through Air, and the Vite frontend. Compose starts PostgreSQL on port 54320 and an Immich stub on port 3001 by default. Air waits for both dependencies, supplies development-only runtime configuration, rebuilds the API, and regenerates Tygo types when Go files change. Vite starts after the API becomes live.
 
-Existing runtime configuration is respected. Set `MEMENTO_DATABASE_URL` or `MEMENTO_DATABASE_URL_FILE` to use an external development database, and set `MEMENTO_IMMICH_URL` plus an API key to use an external Immich instance. Setting `MEMENTO_CONFIG_FILE` disables all automatically managed services. When overriding the API address, set `MEMENTO_API_PROXY_TARGET` to its HTTP origin if it cannot be derived from `MEMENTO_HTTP_ADDRESS`.
+Stopping `mise start` stops the Compose services while preserving PostgreSQL data in its named volume. Run `docker compose down --volumes` to reset that data. `MEMENTO_DEV_POSTGRES_PORT` and `MEMENTO_DEV_IMMICH_PORT` override the dependency ports. The individual `mise start:deps`, `mise start:air`, and `mise start:web` tasks remain available when only part of the environment is needed.
 
 Validate changes before pushing with the fast local gate:
 
@@ -68,13 +68,13 @@ Run the complete suite used by CI when needed:
 mise ci
 ```
 
-`mise ci` includes `mise check`, then adds Go race detection, isolated PostgreSQL integration tests, the disposable development environment test, Caddy validation, and the production topology test. Docker-backed tests use unique names, images, and dynamic local ports so concurrent worktrees do not share test resources.
+`mise ci` includes `mise check`, then adds Go race detection, isolated PostgreSQL integration tests, development Compose validation, Caddy validation, and the production topology test. Docker-backed tests use unique names, images, and dynamic local ports so concurrent worktrees do not share test resources.
 
 The integration task provisions an isolated PostgreSQL 17 database and removes it when the tests finish. It does not connect to an existing PostgreSQL server unless `MEMENTO_TEST_DATABASE_URL` is explicitly set. Set that variable to use an explicitly managed integration database instead of the disposable container.
 
 Tygo output under `app/types/generated/` is gitignored. Mise generates it from Go before every frontend task that consumes it, so contributors never need to commit regenerated files with a PR. The production Docker build also generates its own copy instead of depending on the local working tree.
 
-Individual checks are available through names such as `mise lint:eslint`, `mise lint:prettier`, `mise lint:types`, `mise types:generate`, `mise test:integration`, `mise test:development`, `mise caddy:validate`, and `mise test:production`.
+Individual checks are available through names such as `mise lint:eslint`, `mise lint:prettier`, `mise lint:types`, `mise types:generate`, `mise test:integration`, `mise compose:validate`, `mise caddy:validate`, and `mise test:production`. Docker-backed test harnesses live under `tests/`.
 
 ## Provision PostgreSQL beside Immich
 

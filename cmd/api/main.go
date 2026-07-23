@@ -76,12 +76,17 @@ func run() error {
 		log.Err(err).Error("worker startup failed")
 		return err
 	}
+	healthService := health.New(db, immichClient, jobWorker, cfg.Database.HealthTimeout, cfg.Worker.HeartbeatMaxAge)
+	e, err := server.New(healthService)
+	if err != nil {
+		_ = db.Close()
+		log.Err(err).Error("HTTP server initialization failed")
+		return err
+	}
+
 	workCtx, cancelWork := context.WithCancel(context.Background())
 	defer cancelWork()
 	jobWorker.Start(workCtx)
-
-	healthService := health.New(db, immichClient, jobWorker, cfg.Database.HealthTimeout, cfg.Worker.HeartbeatMaxAge)
-	e := server.New(healthService)
 
 	signalCtx, stopSignals := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stopSignals()

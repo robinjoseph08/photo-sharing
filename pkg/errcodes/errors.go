@@ -2,6 +2,7 @@
 package errcodes
 
 import (
+	"fmt"
 	"maps"
 	"net/http"
 )
@@ -27,6 +28,41 @@ func (e *Error) Is(target error) bool {
 		targetError.Message == e.Message &&
 		targetError.Code == e.Code &&
 		maps.Equal(targetError.FieldErrors, e.FieldErrors)
+}
+
+// UnsupportedMediaType returns a 415 error for unsupported request content.
+func UnsupportedMediaType() error {
+	return &Error{
+		HTTPCode:    http.StatusUnsupportedMediaType,
+		Message:     http.StatusText(http.StatusUnsupportedMediaType),
+		Code:        "unsupported_media_type",
+		FieldErrors: nil,
+	}
+}
+
+// UnknownParameter returns a 422 error naming an unexpected parameter.
+func UnknownParameter(parameter string) error {
+	return &Error{
+		HTTPCode:    http.StatusUnprocessableEntity,
+		Message:     fmt.Sprintf("Unknown parameter %q.", parameter),
+		Code:        "unknown_parameter",
+		FieldErrors: nil,
+	}
+}
+
+// ValidationTypeError returns a 422 error for a value with the wrong type.
+func ValidationTypeError(message string) error {
+	return &Error{HTTPCode: http.StatusUnprocessableEntity, Message: message, Code: "validation_type_error", FieldErrors: nil}
+}
+
+// MalformedPayload returns a 400 error for an unreadable request payload.
+func MalformedPayload() error {
+	return &Error{HTTPCode: http.StatusBadRequest, Message: "Malformed payload.", Code: "malformed_payload", FieldErrors: nil}
+}
+
+// EmptyRequestBody returns a 400 error when a mutation requires a body.
+func EmptyRequestBody() error {
+	return &Error{HTTPCode: http.StatusBadRequest, Message: "Request body can't be empty.", Code: "empty_request_body", FieldErrors: nil}
 }
 
 // BadRequest returns a 400 error with the given safe message.

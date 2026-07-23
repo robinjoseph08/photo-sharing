@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-FROM golang:1.25.5-alpine3.23 AS go-base
+FROM golang:1.26.5-alpine3.23 AS go-base
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
@@ -10,7 +10,7 @@ FROM go-base AS typegen
 COPY tygo.yaml ./
 RUN go tool tygo generate
 
-FROM node:24.13.0-alpine3.23 AS frontend
+FROM node:24.18.0-alpine3.23 AS frontend
 WORKDIR /src
 RUN npm install --global pnpm@11.16.0
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
