@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 )
 
 // ReadinessGate drops readiness before any draining begins.
@@ -28,8 +29,8 @@ type Closer interface {
 	Close() error
 }
 
-// Shutdown performs the required shutdown sequence using one caller-supplied deadline.
-func Shutdown(ctx context.Context, gate ReadinessGate, server HTTPServer, worker Worker, database Closer) error {
+// Shutdown performs the required sequence within the overall deadline and worker drain bound.
+func Shutdown(ctx context.Context, workerDrainTimeout time.Duration, gate ReadinessGate, server HTTPServer, worker Worker, database Closer) error {
 	gate.SetDraining()
 	worker.StopClaims()
 
@@ -37,9 +38,11 @@ func Shutdown(ctx context.Context, gate ReadinessGate, server HTTPServer, worker
 	if err := server.Shutdown(ctx); err != nil {
 		shutdownErrors = append(shutdownErrors, fmt.Errorf("drain HTTP: %w", err))
 	}
-	if err := worker.Drain(ctx); err != nil {
+	workerCtx, cancelWorker := context.WithTimeout(ctx, workerDrainTimeout)
+	if err := worker.Drain(workerCtx); err != nil {
 		shutdownErrors = append(shutdownErrors, fmt.Errorf("drain worker: %w", err))
 	}
+	cancelWorker()
 	if err := database.Close(); err != nil {
 		shutdownErrors = append(shutdownErrors, fmt.Errorf("close database: %w", err))
 	}

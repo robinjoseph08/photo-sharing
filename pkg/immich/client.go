@@ -2,6 +2,7 @@
 package immich
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -69,10 +70,17 @@ func (c *Client) Check(ctx context.Context) error {
 		_, _ = io.Copy(io.Discard, io.LimitReader(response.Body, maxVersionResponse))
 		return errors.New("Immich version check failed")
 	}
+	body, err := io.ReadAll(io.LimitReader(response.Body, maxVersionResponse+1))
+	if err != nil || len(body) > maxVersionResponse {
+		return errors.New("Immich returned an invalid version")
+	}
 	var version versionResponse
-	decoder := json.NewDecoder(io.LimitReader(response.Body, maxVersionResponse))
+	decoder := json.NewDecoder(bytes.NewReader(body))
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&version); err != nil {
+		return errors.New("Immich returned an invalid version")
+	}
+	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
 		return errors.New("Immich returned an invalid version")
 	}
 	actual := fmt.Sprintf("%d.%d.%d", version.Major, version.Minor, version.Patch)

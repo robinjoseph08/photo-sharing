@@ -109,7 +109,7 @@ func run() error {
 
 	shutdownCtx, cancelShutdown := context.WithTimeout(context.Background(), cfg.HTTP.ShutdownTimeout)
 	defer cancelShutdown()
-	if err := lifecycle.Shutdown(shutdownCtx, healthService, e, jobWorker, db); err != nil {
+	if err := lifecycle.Shutdown(shutdownCtx, cfg.Worker.DrainTimeout, healthService, e, jobWorker, db); err != nil {
 		log.Err(err).Error("graceful shutdown exceeded its bounds")
 		return err
 	}

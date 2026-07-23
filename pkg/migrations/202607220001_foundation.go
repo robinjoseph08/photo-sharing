@@ -39,7 +39,7 @@ func init() {
 						created_at timestamptz NOT NULL DEFAULT now(),
 						updated_at timestamptz NOT NULL DEFAULT now(),
 						CHECK ((lease_owner IS NULL) = (lease_expires_at IS NULL)),
-						CHECK (status = 'running' OR lease_owner IS NULL)
+						CHECK ((status = 'running') = (lease_owner IS NOT NULL))
 					)`,
 					`CREATE INDEX jobs_claimable_idx ON jobs (available_at, id)
 						WHERE status = 'pending' OR status = 'running'`,
@@ -65,7 +65,11 @@ func init() {
 }
 
 // Apply initializes Bun's migration ledger and applies migrations while holding its PostgreSQL advisory lock.
-func Apply(ctx context.Context, db *bun.DB) (err error) {
+func Apply(ctx context.Context, db *bun.DB) error {
+	return applyCollection(ctx, db, collection)
+}
+
+func applyCollection(ctx context.Context, db *bun.DB, migrations *migrate.Migrations) (err error) {
 	// The lock must precede Migrator.Init. PostgreSQL can race two concurrent
 	// CREATE TABLE IF NOT EXISTS statements while their catalog rows are still
 	// invisible, and extensions are scoped to the whole logical database rather
@@ -91,7 +95,7 @@ func Apply(ctx context.Context, db *bun.DB) (err error) {
 		}
 	}()
 
-	migrator := migrate.NewMigrator(db, collection, migrate.WithMarkAppliedOnSuccess(true))
+	migrator := migrate.NewMigrator(db, migrations, migrate.WithMarkAppliedOnSuccess(true))
 	if err := migrator.Init(ctx); err != nil {
 		return fmt.Errorf("initialize migrations: %w", err)
 	}

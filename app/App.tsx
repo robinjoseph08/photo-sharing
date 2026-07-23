@@ -51,7 +51,11 @@ export function App() {
     retry: false,
   });
 
-  const state = liveness.isSuccess ? "Connected" : "Starting";
+  const state = liveness.isSuccess
+    ? "Process reachable"
+    : liveness.isError
+      ? "Unavailable"
+      : "Starting";
 
   return (
     <main>

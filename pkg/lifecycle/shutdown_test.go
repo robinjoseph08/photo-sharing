@@ -42,12 +42,20 @@ func (f fakeServer) Shutdown(ctx context.Context) error {
 }
 
 type fakeWorker struct {
-	r   *recorder
-	err error
+	r     *recorder
+	err   error
+	block bool
 }
 
-func (f fakeWorker) StopClaims()                 { f.r.add("stop_claims") }
-func (f fakeWorker) Drain(context.Context) error { f.r.add("worker"); return f.err }
+func (f fakeWorker) StopClaims() { f.r.add("stop_claims") }
+func (f fakeWorker) Drain(ctx context.Context) error {
+	f.r.add("worker")
+	if f.block {
+		<-ctx.Done()
+		return ctx.Err()
+	}
+	return f.err
+}
 
 type fakeDatabase struct {
 	r   *recorder
@@ -58,7 +66,7 @@ func (f fakeDatabase) Close() error { f.r.add("database"); return f.err }
 
 func TestShutdownOrdersReadinessClaimsDrainAndClose(t *testing.T) {
 	r := &recorder{}
-	err := Shutdown(context.Background(), fakeGate{r}, fakeServer{r: r}, fakeWorker{r: r}, fakeDatabase{r: r})
+	err := Shutdown(context.Background(), time.Second, fakeGate{r}, fakeServer{r: r}, fakeWorker{r: r}, fakeDatabase{r: r})
 	require.NoError(t, err)
 	assert.Equal(t, []string{"unready", "stop_claims", "http", "worker", "database"}, r.steps)
 }
@@ -66,7 +74,7 @@ func TestShutdownOrdersReadinessClaimsDrainAndClose(t *testing.T) {
 func TestShutdownClosesDatabaseAndJoinsEveryFailure(t *testing.T) {
 	r := &recorder{}
 	err := Shutdown(
-		context.Background(), fakeGate{r},
+		context.Background(), time.Second, fakeGate{r},
 		fakeServer{r: r, err: errors.New("HTTP failure")},
 		fakeWorker{r: r, err: errors.New("worker failure")},
 		fakeDatabase{r: r, err: errors.New("database failure")},
@@ -78,12 +86,21 @@ func TestShutdownClosesDatabaseAndJoinsEveryFailure(t *testing.T) {
 	assert.Equal(t, "database", r.steps[len(r.steps)-1])
 }
 
+func TestShutdownUsesWorkerDrainTimeout(t *testing.T) {
+	r := &recorder{}
+	started := time.Now()
+	err := Shutdown(context.Background(), 5*time.Millisecond, fakeGate{r}, fakeServer{r: r}, fakeWorker{r: r, block: true}, fakeDatabase{r: r})
+	require.ErrorContains(t, err, "context deadline exceeded")
+	assert.Less(t, time.Since(started), 100*time.Millisecond)
+	assert.Equal(t, "database", r.steps[len(r.steps)-1])
+}
+
 func TestShutdownUsesCallerDeadline(t *testing.T) {
 	r := &recorder{}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Millisecond)
 	defer cancel()
 	started := time.Now()
-	err := Shutdown(ctx, fakeGate{r}, fakeServer{r: r, block: true}, fakeWorker{r: r}, fakeDatabase{r: r})
+	err := Shutdown(ctx, time.Second, fakeGate{r}, fakeServer{r: r, block: true}, fakeWorker{r: r}, fakeDatabase{r: r})
 	require.ErrorContains(t, err, "context deadline exceeded")
 	assert.Less(t, time.Since(started), 100*time.Millisecond)
 	assert.Equal(t, "database", r.steps[len(r.steps)-1])

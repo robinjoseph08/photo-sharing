@@ -15,7 +15,10 @@ import (
 
 // Open connects only after config validation has confirmed the selected logical database.
 func Open(ctx context.Context, cfg config.DatabaseConfig) (*bun.DB, error) {
-	connector := pgdriver.NewConnector(pgdriver.WithDSN(cfg.URL))
+	connector, err := pgdriver.NewDriver().OpenConnector(cfg.URL)
+	if err != nil {
+		return nil, errors.New("parse Memento database URL")
+	}
 	db := bun.NewDB(sql.OpenDB(connector), pgdialect.New())
 	db.SetMaxOpenConns(cfg.MaxOpenConns)
 	if err := db.PingContext(ctx); err != nil {

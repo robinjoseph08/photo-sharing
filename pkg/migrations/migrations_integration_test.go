@@ -43,6 +43,16 @@ func TestApplyFromEmptyDatabaseUnderConcurrentLock(t *testing.T) {
 	assert.Zero(t, jobsCount)
 }
 
+func TestJobsRejectRunningStateWithoutAReclaimableLease(t *testing.T) {
+	db := testdb.Open(t)
+	ctx := context.Background()
+	require.NoError(t, Apply(ctx, db))
+
+	_, err := db.ExecContext(ctx, `INSERT INTO jobs (kind, status) VALUES ('test', 'running')`)
+	require.Error(t, err)
+	assert.ErrorContains(t, err, "jobs_check")
+}
+
 func TestCurrentDetectsUnappliedMigration(t *testing.T) {
 	db := testdb.Open(t)
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)

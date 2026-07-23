@@ -42,8 +42,18 @@ self.addEventListener("fetch", (event) => {
   if (!isPublicAsset) return;
 
   event.respondWith(
-    caches
-      .match(event.request)
-      .then((cached) => cached || fetch(event.request)),
+    fetch(event.request)
+      .then(async (response) => {
+        if (response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(event.request, response.clone());
+        }
+        return response;
+      })
+      .catch(async () => {
+        const cached = await caches.match(event.request);
+        if (!cached) throw new Error("public asset is unavailable");
+        return cached;
+      }),
   );
 });

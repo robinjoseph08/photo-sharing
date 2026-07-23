@@ -41,6 +41,9 @@ func TestCheckReturnsSafeErrors(t *testing.T) {
 		{"status", http.StatusUnauthorized, "private dependency response", "Immich version check failed"},
 		{"malformed", http.StatusOK, `{`, "Immich returned an invalid version"},
 		{"unknown fields", http.StatusOK, `{"major":3,"minor":0,"patch":3,"url":"private"}`, "Immich returned an invalid version"},
+		{"trailing JSON", http.StatusOK, `{"major":3,"minor":0,"patch":3}{}`, "Immich returned an invalid version"},
+		{"trailing garbage", http.StatusOK, `{"major":3,"minor":0,"patch":3} private`, "Immich returned an invalid version"},
+		{"oversized", http.StatusOK, `{"major":3,"minor":0,"patch":3}` + strings.Repeat(" ", maxVersionResponse), "Immich returned an invalid version"},
 		{"unsupported", http.StatusOK, `{"major":3,"minor":0,"patch":4}`, "Immich version is unsupported"},
 	}
 	for _, test := range tests {

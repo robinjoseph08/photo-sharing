@@ -79,8 +79,8 @@ type rawConfig struct {
 }
 
 var defaults = map[string]any{
-	"http.address":              ":8081",
-	"http.shutdown_timeout":     "20s",
+	"http.address":              "127.0.0.1:8081",
+	"http.shutdown_timeout":     "8s",
 	"database.name":             "memento",
 	"database.max_open_conns":   10,
 	"database.health_timeout":   "2s",
@@ -89,7 +89,7 @@ var defaults = map[string]any{
 	"worker.heartbeat_interval": "2s",
 	"worker.heartbeat_max_age":  "10s",
 	"worker.lease_duration":     "30s",
-	"worker.drain_timeout":      "15s",
+	"worker.drain_timeout":      "5s",
 }
 
 // Load reads defaults, an optional YAML file, environment variables, and secret files in that order.

@@ -2,11 +2,11 @@ services:
   postgres:
     image: postgres:17.7-alpine3.23
     environment:
-      POSTGRES_DB: memento
-      POSTGRES_USER: memento_app
-      POSTGRES_PASSWORD: test-only-password
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: test-admin-only-password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U memento_app -d memento"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 1s
       timeout: 3s
       retries: 30
@@ -14,6 +14,8 @@ services:
       - "127.0.0.1:54329:5432"
     tmpfs:
       - /var/lib/postgresql/data
+    volumes:
+      - ./init-test-database.sql:/docker-entrypoint-initdb.d/init-test-database.sql:ro
 
   immich:
     image: caddy:2.10.2-alpine

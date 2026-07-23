@@ -25,7 +25,7 @@ func TestLoadUsesDefaultsAndEnvironment(t *testing.T) {
 
 	cfg, err := Load("")
 	require.NoError(t, err)
-	assert.Equal(t, ":8081", cfg.HTTP.Address)
+	assert.Equal(t, "127.0.0.1:8081", cfg.HTTP.Address)
 	assert.Equal(t, 7*time.Second, cfg.HTTP.ShutdownTimeout)
 	assert.Equal(t, 4, cfg.Database.MaxOpenConns)
 }

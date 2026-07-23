@@ -12,15 +12,16 @@ Memento does not read Immich's PostgreSQL data. It connects to Immich only throu
 
 ## Operator prerequisites
 
-An operator will need:
+The current foundation requires:
 
-- an existing Immich v3.0.3 instance, or a later release that has passed Memento's contract tests;
+- an existing Immich v3.0.3 instance, which is the exact version supported by this release;
 - PostgreSQL with permission to create a role, database, and extensions;
 - the `unaccent` and `pg_trgm` extension files installed on that PostgreSQL server;
-- generic SMTP credentials for email;
-- HTTPS for public access and Web Push;
 - an Immich API key limited to the permissions documented in the specification;
+- HTTPS for public access;
 - a backup location outside the PostgreSQL container.
+
+Later MVP phases will also require generic SMTP credentials for email and HTTPS-capable devices for Web Push. Supporting a later Immich release requires a future Memento release that updates the hardcoded version pin after its connector contract suite passes.
 
 The PostgreSQL image recommended by Immich v3.0.3 already contains `unaccent` and `pg_trgm`, but extensions must be created separately inside each logical database.
 

@@ -19,7 +19,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-test("renders the connected shell when liveness succeeds", async () => {
+test("reports that the process is reachable when liveness succeeds", async () => {
   vi.stubGlobal(
     "fetch",
     vi
@@ -32,7 +32,7 @@ test("renders the connected shell when liveness succeeds", async () => {
   renderApp();
 
   expect(screen.getByRole("heading", { name: "Memento" })).toBeInTheDocument();
-  expect(await screen.findByText("Connected")).toBeInTheDocument();
+  expect(await screen.findByText("Process reachable")).toBeInTheDocument();
 });
 
 test("does not expose dependency detail when liveness fails", async () => {
@@ -43,6 +43,6 @@ test("does not expose dependency detail when liveness fails", async () => {
 
   renderApp();
 
-  expect(await screen.findByText("Starting")).toBeInTheDocument();
+  expect(await screen.findByText("Unavailable")).toBeInTheDocument();
   expect(screen.queryByText(/database|Immich/i)).not.toBeInTheDocument();
 });

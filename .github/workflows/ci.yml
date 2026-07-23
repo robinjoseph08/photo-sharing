@@ -20,13 +20,13 @@ jobs:
       postgres:
         image: postgres:17.7-alpine3.23
         env:
-          POSTGRES_DB: memento
-          POSTGRES_USER: memento_app
-          POSTGRES_PASSWORD: test-only-password
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: test-admin-only-password
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U memento_app -d memento"
+          --health-cmd "pg_isready -U postgres -d postgres"
           --health-interval 1s
           --health-timeout 3s
           --health-retries 30
@@ -34,6 +34,12 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Provision restricted application database role
+        run: >-
+          docker exec --interactive "${{ job.services.postgres.id }}"
+          psql --set ON_ERROR_STOP=1 --username postgres --dbname postgres
+          < deploy/init-test-database.sql
 
       - name: Set up Go
         uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6

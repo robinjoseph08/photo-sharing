@@ -33,8 +33,17 @@ grep -q '"migrations":"ok"' "$ready_body"
 grep -q '"worker":"ok"' "$ready_body"
 grep -q '"immich":"ok"' "$ready_body"
 
-curl --fail --silent http://127.0.0.1:18080/ | grep -q '<title>Memento</title>'
+curl --fail --silent http://127.0.0.1:18080/ > "$temporary/index.html"
+grep -q '<title>Memento</title>' "$temporary/index.html"
+for asset in $(grep -Eo '(src|href)="/assets/[^"]+"' "$temporary/index.html" | cut -d'"' -f2); do
+  curl --fail --silent --output /dev/null "http://127.0.0.1:18080$asset"
+done
+curl --fail --silent --output /dev/null http://127.0.0.1:18080/manifest.webmanifest
+curl --fail --silent --output /dev/null http://127.0.0.1:18080/service-worker.js
 [ "$(curl --fail --silent http://127.0.0.1:18080/api/health/live)" = '{"status":"live"}' ]
+api_code=$(curl --silent --output "$temporary/api.json" --write-out '%{http_code}' http://127.0.0.1:18080/api)
+[ "$api_code" = 404 ]
+grep -q '"code":"http_404"' "$temporary/api.json"
 curl --fail --silent --dump-header "$temporary/headers" --output /dev/null http://127.0.0.1:18080/
 grep -qi '^Content-Security-Policy:' "$temporary/headers"
 if grep -qi '^Server:' "$temporary/headers"; then
@@ -46,7 +55,17 @@ $compose exec --no-TTY postgres psql --username memento_app --dbname memento --t
   "SELECT count(*) FROM pg_extension WHERE extname IN ('unaccent', 'pg_trgm');" | grep -Eq '^[[:space:]]*2[[:space:]]*$'
 $compose exec --no-TTY postgres psql --username memento_app --dbname memento --tuples-only --command \
   "SELECT count(*) FROM bun_migrations;" | grep -Eq '^[[:space:]]*1[[:space:]]*$'
+$compose exec --no-TTY postgres psql --username postgres --dbname postgres --tuples-only --command \
+  "SELECT rolsuper FROM pg_roles WHERE rolname = 'memento_app';" | grep -Eq '^[[:space:]]*f[[:space:]]*$'
 $compose exec --no-TTY memento sh -c "ps | grep -q '[m]emento' && ps | grep -q '[c]addy'"
+container=$($compose ps --quiet memento)
+image_user=$(docker inspect --format '{{.Config.User}}' "$container")
+[ -n "$image_user" ] && [ "$image_user" != 0 ] && [ "$image_user" != root ]
+[ "$($compose exec --no-TTY memento id -u)" -ne 0 ]
+if $compose exec --no-TTY immich wget -q -O /dev/null http://memento:8081/api/health/live 2>/dev/null; then
+  printf 'Go API is reachable outside its loopback production boundary\n' >&2
+  exit 1
+fi
 
 $compose stop immich
 ready_code=$(curl --silent --output "$ready_body" --write-out '%{http_code}' http://127.0.0.1:18080/api/health/ready)
@@ -59,7 +78,6 @@ fi
 [ "$(curl --fail --silent http://127.0.0.1:18080/api/health/live)" = '{"status":"live"}' ]
 $compose start immich
 
-container=$($compose ps --quiet memento)
 started=$(date +%s)
 docker kill --signal TERM "$container" >/dev/null
 for _ in $(seq 1 12); do
