@@ -84,13 +84,14 @@ depends = ["types:generate"]
 run = "./scripts/test-production.sh"
 
 [tasks.check]
-description = "Run all validation checks"
+description = "Run fast validation checks before pushing"
+depends = ["lint", "lint:js", "types:generate", "test", "build"]
+
+[tasks.ci]
+description = "Run the complete CI validation suite"
 depends = [
-  "lint",
-  "lint:js",
-  "types:generate",
-  "test",
-  "build",
+  "check",
+  "test:race",
   "test:integration",
   "caddy:validate",
   "test:production",

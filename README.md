@@ -50,17 +50,27 @@ mise run build
 mise run types:generate
 ```
 
-Run the complete suite used by CI with one command:
+Validate changes before pushing with the fast local gate:
 
 ```sh
-mise run check
+mise check
 ```
 
-The integration task uses Docker to provision an isolated PostgreSQL 17 database on a dynamic local port, then removes it when the tests finish. It does not connect to an existing PostgreSQL server unless `MEMENTO_TEST_DATABASE_URL` is explicitly set.
+`mise check` is safe to run concurrently from multiple worktrees. It generates API types, runs Go and frontend linters and unit tests, and builds the frontend. `mise lint` runs golangci-lint, while `mise lint:js` runs ESLint, Prettier, and TypeScript checks in parallel.
+
+Run the complete suite used by CI when needed:
+
+```sh
+mise ci
+```
+
+`mise ci` includes `mise check`, then adds Go race detection, isolated PostgreSQL integration tests, Caddy validation, and the production topology test. Docker-backed tests use unique names, images, and dynamic local ports so concurrent worktrees do not share test resources.
+
+The integration task provisions an isolated PostgreSQL 17 database and removes it when the tests finish. It does not connect to an existing PostgreSQL server unless `MEMENTO_TEST_DATABASE_URL` is explicitly set. Set that variable to use an explicitly managed integration database instead of the disposable container.
 
 Tygo output under `app/types/generated/` is gitignored. Mise generates it from Go before every frontend task that consumes it, so contributors never need to commit regenerated files with a PR. The production Docker build also generates its own copy instead of depending on the local working tree.
 
-The `check` task generates API types, runs Go and frontend linters and unit tests, builds the frontend, runs PostgreSQL integration tests, validates Caddy, and assembles and tests the production topology. `mise run lint` runs golangci-lint, while `mise run lint:js` runs ESLint, Prettier, and TypeScript checks in parallel. Individual checks are also available through names such as `mise run lint:eslint`, `mise run lint:prettier`, `mise run lint:types`, `mise run types:generate`, `mise run test:integration`, `mise run caddy:validate`, and `mise run test:production`. Set `MEMENTO_TEST_DATABASE_URL` to use an explicitly managed integration database instead of the disposable container.
+Individual checks are available through names such as `mise lint:eslint`, `mise lint:prettier`, `mise lint:types`, `mise types:generate`, `mise test:integration`, `mise caddy:validate`, and `mise test:production`.
 
 ## Provision PostgreSQL beside Immich
 
