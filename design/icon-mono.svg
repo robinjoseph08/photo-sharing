@@ -1,7 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <mask id="front-photo-cutout">
+      <rect width="1024" height="1024" fill="white" />
+      <rect x="263" y="310" width="498" height="478" rx="116" fill="black" />
+    </mask>
+  </defs>
   <g fill="currentColor">
-    <path d="M166 330l-7-28a72 72 0 0 1 52-87l175-44a72 72 0 0 1 87 52l20 80z" />
-    <path d="M531 303l20-80a72 72 0 0 1 87-52l175 44a72 72 0 0 1 52 87l-7 28z" />
-    <rect x="307" y="374" width="410" height="390" rx="72" />
+    <g mask="url(#front-photo-cutout)">
+      <rect x="248" y="270" width="340" height="440" rx="72" transform="rotate(-14 418 490)" />
+      <rect x="436" y="270" width="340" height="440" rx="72" transform="rotate(14 606 490)" />
+    </g>
+    <rect x="307" y="354" width="410" height="390" rx="72" />
   </g>
 </svg>

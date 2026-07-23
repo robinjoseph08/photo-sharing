@@ -1,6 +1,6 @@
 /* global caches, fetch, self, URL */
 
-const CACHE_NAME = "memento-shell-v1";
+const CACHE_NAME = "memento-shell-v2";
 const PUBLIC_PATHS = new Set([
   "/",
   "/manifest.webmanifest",
